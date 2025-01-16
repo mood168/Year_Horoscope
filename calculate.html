@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流年運數指引</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/calculate.css">
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">流年運數</a>
+            <div class="nav-links">
+                <a href="calculate.html" class="nav-link">流年流月計算</a>
+                <a href="lifenumber.html" class="nav-link">流年運數指引</a>
+                <a href="index.html" class="nav-link">返回首頁</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>流年流月計算</h1>
+            <div class="current-date">
+                <div id="current-date"></div>
+            </div>
+        </header>
+
+        <main>
+            <div class="calculator-container">
+                <div class="input-section">
+                    <h2>請輸入您的出生日期</h2>
+                    <div class="birth-inputs">
+                        <div class="input-group">
+                            <label for="birthYear">出生年份</label>
+                            <input type="text" id="birthYear" placeholder="YYYY" value="1969">
+                        </div>
+                        <div class="input-group">
+                            <label for="birthMonth">出生月份</label>
+                            <input type="text" id="birthMonth" placeholder="MM" value="09">
+                        </div>
+                        <div class="input-group">
+                            <label for="birthDay">出生日期</label>
+                            <input type="text" id="birthDay" placeholder="DD" value="12">
+                        </div>
+                    </div>
+                    <button id="calculateBtn" class="calculate-button">計算</button>
+                </div>
+
+                <div class="result-section" style="display: none;">
+                    <div class="result-row">
+                        <div class="result-card" id="yearResult">
+                            <h3>流年計算結果</h3>
+                            <div class="calculation-steps">
+                                <div class="step">
+                                    <span class="step-label">當年年份：</span>
+                                    <span class="step-value" id="currentYear">2025</span>
+                                </div>
+                                <div class="step">
+                                    <span class="step-label">出生月日：</span>
+                                    <span class="step-value" id="birthMD"></span>
+                                </div>
+                                <div class="step">
+                                    <span class="step-label">流年數字：</span>
+                                    <span class="step-value" id="yearNumber"></span>
+                                </div>
+                            </div>
+                            <div class="result-note" id="yearNote"></div>
+                        </div>
+
+                        <div class="result-card" id="monthResult">
+                            <h3>流月計算結果</h3>
+                            <div class="calculation-steps">
+                                <div class="step">
+                                    <span class="step-label">當前流年：</span>
+                                    <span class="step-value" id="currentFlowYear"></span>
+                                </div>
+                                <div class="step">
+                                    <span class="step-label">當前月份：</span>
+                                    <span class="step-value" id="currentMonth"></span>
+                                </div>
+                                <div class="step">
+                                    <span class="step-label">流月數字：</span>
+                                    <span class="step-value" id="monthNumber"></span>
+                                </div>
+                            </div>
+                            <div class="result-note" id="monthNote"></div>
+                        </div>
+                    </div>
+
+                    <div class="horoscope-content" id="yearHoroscope" style="display: none;">
+                        <div class="horoscope-section">
+                            <h4 class="horoscope-title"></h4>
+                            <p class="horoscope-description"></p>
+                            <div class="horoscope-details">
+                                <div class="suggestions-section">
+                                    <h5>年度建議</h5>
+                                    <ul class="suggestion-list"></ul>
+                                </div>
+                                <div class="focus-section">
+                                    <h5>重點領域</h5>
+                                    <div class="focus-tags"></div>
+                                </div>
+                            </div>
+                            <div class="fortune-link">
+                                <button id="viewFortuneBtn" class="fortune-button" onclick="viewFortune()">流年運勢指引</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="js/calculate.js"></script>
+</body>
+</html>

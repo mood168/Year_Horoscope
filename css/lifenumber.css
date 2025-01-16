@@ -1,0 +1,92 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+h1 {
+    font-size: 2.5em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.description {
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.life-numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.number-card {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.number-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.number {
+    font-size: 3em;
+    font-weight: bold;
+    color: #4a90e2;
+    margin-bottom: 15px;
+}
+
+.title {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.brief {
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .life-numbers-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding: 15px;
+    }
+
+    .number-card {
+        padding: 20px;
+    }
+
+    .number {
+        font-size: 2.5em;
+    }
+}
+
+@media (max-width: 480px) {
+    .life-numbers-grid {
+        grid-template-columns: 1fr;
+    }
+}
