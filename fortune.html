@@ -1,57 +1,119 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>流年運數指引</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/fortune.css">
-</head>
-<body>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/fortune.css" />
+    <link rel="stylesheet" href="css/toast.css" />
+  </head>
+  <body>
     <nav class="nav-bar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">流年運數</a>
-            <div class="nav-links">
-                <a href="calculate.html" class="nav-link">流年流月計算</a>
-                <a href="lifenumber.html" class="nav-link">流年運數指引</a>
-                <a href="index.html" class="nav-link">返回首頁</a>
-            </div>
+      <div class="nav-container">
+        <a href="index.html" class="nav-logo">流年運數</a>
+        <div class="nav-links">
+          <a href="calculate.html" class="nav-link">流年流月計算</a>
+          <a href="lifenumber.html" class="nav-link">流年運數指引</a>
+          <a href="index.html" class="nav-link">返回首頁</a>
         </div>
+        <button class="menu-toggle" aria-label="選單">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
     </nav>
 
     <div class="container">
-        <header>
-            <h1>流年運勢指引</h1>
-            <div class="life-number-display">
-                <h2>您的流年數字：<span id="selectedNumber"></span></h2>
+      <header class="fortune-header animate__animated animate__fadeIn">
+        <h1>流年運勢指引</h1>
+        <div class="life-number-display">
+          <h2>
+            您的流年數字：<span
+              id="selectedNumber"
+              class="highlight-number"
+            ></span>
+          </h2>
+        </div>
+      </header>
+
+      <main class="fortune-main">
+        <div class="fortune-navigation">
+          <button class="nav-button active" data-section="career">
+            事業方向
+          </button>
+          <button class="nav-button" data-section="goals">年度目標</button>
+          <button class="nav-button" data-section="monthly">月度計劃</button>
+          <button class="nav-button" data-section="notes">注意事項</button>
+        </div>
+
+        <div class="fortune-content">
+          <section
+            id="career"
+            class="content-section active animate__animated animate__fadeIn"
+          >
+            <h3>適合今年的事業方向</h3>
+            <div class="career-cards" id="careerContent">
+              <!-- 動態載入內容 -->
             </div>
-        </header>
+          </section>
 
-        <main>
-            <section class="fortune-content">
-                <div class="yearly-fortune">
-                    <h3>流年年度運勢總論</h3>
-                    <div id="yearlyFortune"></div>
-                </div>
+          <section id="goals" class="content-section animate__animated">
+            <h3>年度目標設定</h3>
+            <div class="goals-section">
+              <div class="goals-list" id="goalsContent">
+                <!-- 動態載入內容 -->
+              </div>
+              <div class="goals-input">
+                <h4>個人目標記錄</h4>
+                <textarea
+                  id="personalGoals"
+                  placeholder="記錄您的個人年度目標..."
+                ></textarea>
+                <button id="saveGoals" class="save-button">儲存目標</button>
+              </div>
+            </div>
+          </section>
 
-                <div class="yearly-goals">
-                    <h3>年度目標設定</h3>
-                    <div class="goals-container">
-                        <textarea id="goalsInput" placeholder="設定您的年度目標..."></textarea>
-                        <button id="saveGoals">儲存目標</button>
-                    </div>
-                </div>
+          <section id="monthly" class="content-section animate__animated">
+            <h3>12個月的月度計劃</h3>
+            <div class="monthly-timeline" id="monthlyContent">
+              <!-- 動態載入內容 -->
+            </div>
+          </section>
 
-                <div class="monthly-plans">
-                    <h3>月度計劃</h3>
-                    <button id="generateMonthlyPlan" class="generate-button">生成月度計劃</button>
-                    <div id="monthlyPlanContainer"></div>
-                </div>
-            </section>
-        </main>
+          <section id="notes" class="content-section animate__animated">
+            <h3>注意事項</h3>
+            <div class="notes-cards" id="notesContent">
+              <!-- 動態載入內容 -->
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <div class="fortune-footer">
+        <button id="printButton" class="action-button">
+          <i class="fas fa-print"></i> 列印運勢指引
+        </button>
+        <button id="shareButton" class="action-button">
+          <i class="fas fa-share-alt"></i> 分享運勢
+        </button>
+      </div>
     </div>
+
+    <script
+      src="https://kit.fontawesome.com/your-code.js"
+      crossorigin="anonymous"
+    ></script>
     <script src="js/fortune.js"></script>
-</body>
+  </body>
 </html>

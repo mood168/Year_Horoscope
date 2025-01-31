@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     initializeFortunePage();
+    setupNavigation();
+    setupMobileMenu();
+    setupActionButtons();
 });
 
-function initializeFortunePage() {
+async function initializeFortunePage() {
     const urlParams = new URLSearchParams(window.location.search);
     const lifeNumber = urlParams.get('number') || localStorage.getItem('selectedLifeNumber');
     
@@ -12,179 +15,281 @@ function initializeFortunePage() {
     }
 
     displayLifeNumber(lifeNumber);
-    loadYearlyFortune(lifeNumber);
+    await loadFortuneContent(lifeNumber);
     loadSavedGoals();
-    setupMonthlyPlanGeneration(lifeNumber);
 }
 
 function displayLifeNumber(number) {
     document.getElementById('selectedNumber').textContent = number;
 }
 
-async function loadYearlyFortune(number) {
-    const fortuneElement = document.getElementById('yearlyFortune');
+async function loadFortuneContent(number) {
     try {
-        // 模擬 API 調用，實際使用時替換為真實的 API 端點
-        const mockFortunes = {
-            1: "領導者運勢：今年您將展現出色的領導才能，是實現目標的理想時機。",
-            2: "和諧者運勢：人際關係將成為您的優勢，合作機會處處。",
-            3: "創造者運勢：創意思維活躍，適合開展新項目。",
-            4: "建設者運勢：腳踏實地的努力將帶來豐碩成果。",
-            5: "冒險者運勢：充滿變化與機遇的一年，保持靈活應對。",
-            6: "關懷者運勢：家庭與事業平衡發展，溫暖能量充沛。",
-            7: "智者運勢：深度學習與靈性提升的重要時期。",
-            8: "權威者運勢：財運與事業發展的黃金時期。",
-            9: "智慧者運勢：人生哲理的頓悟期，利於總結與規劃。"
-        };
-        fortuneElement.textContent = mockFortunes[number] || "暫無運勢資料";
+        const response = await fetch(`md_files/${number}.md`);
+        if (!response.ok) throw new Error('無法載入運勢內容');
+        
+        const content = await response.text();
+        console.log('Loaded content:', content); // 除錯用
+        parseAndDisplayContent(content);
     } catch (error) {
-        console.error('Error loading yearly fortune:', error);
-        fortuneElement.textContent = "無法載入運勢資料";
+        console.error('Error loading fortune content:', error);
+        alert('無法載入運勢內容，請稍後再試');
+    }
+}
+
+function parseAndDisplayContent(content) {
+    try {
+        // 解析事業方向
+        const careerMatch = content.match(/### 適合今年的事業方向([\s\S]+?)(?=\n---\n|$)/);
+        if (careerMatch) {
+            displayCareerContent(careerMatch[1]);
+        }
+
+        // 解析年度目標
+        const goalsMatch = content.match(/### 年度目標設定([\s\S]+?)(?=\n---\n|$)/);
+        if (goalsMatch) {
+            displayGoalsContent(goalsMatch[1]);
+        }
+
+        // 解析月度計劃
+        const monthlyMatch = content.match(/### 12 個月的月度計劃([\s\S]+?)(?=\n---\n|$)/);
+        if (monthlyMatch) {
+            displayMonthlyContent(monthlyMatch[1]);
+        }
+
+        // 解析注意事項
+        const notesMatch = content.match(/### 注意事項([\s\S]+?)(?=\n---\n|$)/);
+        if (notesMatch) {
+            displayNotesContent(notesMatch[1]);
+        }
+    } catch (error) {
+        console.error('Error parsing content:', error);
+    }
+}
+
+function displayCareerContent(content) {
+    const container = document.getElementById('careerContent');
+    try {
+        const items = content.match(/\d+\.\s[^:：]+[：:]([\s\S]+?)(?=\d+\.|$)/g) || [];
+        
+        container.innerHTML = items.map(item => {
+            const [title, details] = item.split(/[：:]/);
+            const listItems = details.split('-')
+                .filter(d => d.trim())
+                .map(d => `<li>${d.trim()}</li>`)
+                .join('');
+                
+            return `
+                <div class="career-card animate__animated animate__fadeIn">
+                    <h4>${title.replace(/^\d+\.\s/, '')}</h4>
+                    <ul>${listItems}</ul>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error displaying career content:', error);
+        container.innerHTML = '<div class="no-content">暫無事業方向內容</div>';
+    }
+}
+
+function displayGoalsContent(content) {
+    const container = document.getElementById('goalsContent');
+    try {
+        const items = content.match(/\d+\.\s[^:：]+[：:]([\s\S]+?)(?=\d+\.|$)/g) || [];
+        
+        container.innerHTML = items.map(item => {
+            const [title, details] = item.split(/[：:]/);
+            const listItems = details.split('-')
+                .filter(d => d.trim())
+                .map(d => `<li>${d.trim()}</li>`)
+                .join('');
+                
+            return `
+                <div class="goal-item">
+                    <h4>${title.replace(/^\d+\.\s/, '')}</h4>
+                    <ul>${listItems}</ul>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error displaying goals content:', error);
+        container.innerHTML = '<div class="no-content">暫無年度目標內容</div>';
+    }
+}
+
+function displayMonthlyContent(content) {
+    const container = document.getElementById('monthlyContent');
+    try {
+        const quarters = content.match(/####[^#]+((?:\n-[^#]+)+)/g) || [];
+        
+        const monthlyContent = quarters.map(quarter => {
+            const monthEntries = quarter.match(/- (\d+) 月[：:]([^\n]+)/g) || [];
+            
+            return monthEntries.map(entry => {
+                const [_, month, description] = entry.match(/- (\d+) 月[：:](.+)/) || [];
+                if (!month || !description) return '';
+                
+                return `
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>${month}月</h4>
+                            <p>${description.trim()}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }).join('');
+
+        if (!monthlyContent.trim()) {
+            throw new Error('無月度計劃內容');
+        }
+
+        container.innerHTML = monthlyContent;
+        
+        // 新增動畫延遲
+        const items = container.querySelectorAll('.timeline-item');
+        items.forEach((item, index) => {
+            item.style.animationDelay = `${index * 0.1}s`;
+        });
+    } catch (error) {
+        console.error('Error displaying monthly content:', error);
+        container.innerHTML = '<div class="no-content">暫無月度計劃內容</div>';
+    }
+}
+
+function displayNotesContent(content) {
+    const container = document.getElementById('notesContent');
+    try {
+        const items = content.match(/- ([^:：]+)[：:]([^\n]+)/g) || [];
+        
+        container.innerHTML = items.map(item => {
+            const [_, title, content] = item.match(/- ([^:：]+)[：:](.+)/) || [];
+            return `
+                <div class="note-card animate__animated animate__fadeIn">
+                    <h4>${title.trim()}</h4>
+                    <p>${content.trim()}</p>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error displaying notes content:', error);
+        container.innerHTML = '<div class="no-content">暫無注意事項內容</div>';
+    }
+}
+
+function setupNavigation() {
+    const buttons = document.querySelectorAll('.nav-button');
+    const sections = document.querySelectorAll('.content-section');
+    
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetSection = button.dataset.section;
+            
+            // 更新按鈕狀態
+            buttons.forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            
+            // 更新內容區域
+            sections.forEach(section => {
+                section.classList.remove('active', 'animate__fadeIn');
+                if (section.id === targetSection) {
+                    section.classList.add('active', 'animate__fadeIn');
+                }
+            });
+        });
+    });
+}
+
+function setupMobileMenu() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
     }
 }
 
 function loadSavedGoals() {
-    const goalsInput = document.getElementById('goalsInput');
-    const savedGoals = localStorage.getItem('yearlyGoals');
+    const goalsInput = document.getElementById('personalGoals');
+    const savedGoals = localStorage.getItem('personalYearlyGoals');
     if (savedGoals) {
         goalsInput.value = savedGoals;
     }
 
     document.getElementById('saveGoals').addEventListener('click', () => {
-        localStorage.setItem('yearlyGoals', goalsInput.value);
-        alert('目標已儲存！');
+        localStorage.setItem('personalYearlyGoals', goalsInput.value);
+        showToast('目標已儲存！');
     });
 }
 
-function setupMonthlyPlanGeneration(lifeNumber) {
-    const generateButton = document.getElementById('generateMonthlyPlan');
-    const container = document.getElementById('monthlyPlanContainer');
-
-    generateButton.addEventListener('click', async () => {
-        try {
-            const monthlyPlans = await generateMonthlyPlans(lifeNumber);
-            displayMonthlyPlans(monthlyPlans);
-        } catch (error) {
-            console.error('Error generating monthly plans:', error);
-            alert('生成月度計劃時發生錯誤');
+function setupActionButtons() {
+    // 設定列印功能
+    document.getElementById('printButton').addEventListener('click', () => {
+        window.print();
+    });
+    
+    // 設定分享功能
+    document.getElementById('shareButton').addEventListener('click', () => {
+        if (navigator.share) {
+            navigator.share({
+                title: '我的流年運勢',
+                text: `檢視我的${new Date().getFullYear()}年流年運勢`,
+                url: window.location.href
+            }).catch(console.error);
+        } else {
+            // 如果不支援原生分享，則複製連結
+            copyToClipboard(window.location.href);
+            showToast('連結已複製到剪貼簿');
         }
     });
 }
 
-async function generateMonthlyPlans(lifeNumber) {
-    // 模擬 API 調用，實際使用時替換為真實的 API 端點
-    const mockPlans = {};
-    const months = Array.from({length: 12}, (_, i) => i + 1);
+function copyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast animate__animated animate__fadeIn';
+    toast.textContent = message;
+    document.body.appendChild(toast);
     
-    months.forEach(month => {
-        mockPlans[month] = {
-            focus: `第${month}月重點：${getMonthlyFocus(month, lifeNumber)}`,
-            todos: generateMonthlyTodos(month, lifeNumber)
-        };
-    });
-
-    return mockPlans;
+    setTimeout(() => {
+        toast.classList.remove('animate__fadeIn');
+        toast.classList.add('animate__fadeOut');
+        setTimeout(() => document.body.removeChild(toast), 500);
+    }, 2000);
 }
 
-function getMonthlyFocus(month, lifeNumber) {
-    const focuses = [
-        "事業發展",
-        "人際關係",
-        "健康養生",
-        "財務規劃",
-        "學習成長",
-        "家庭和諧",
-        "心靈提升",
-        "創意展現"
-    ];
-    return focuses[Math.floor(Math.random() * focuses.length)];
-}
-
-function generateMonthlyTodos(month, lifeNumber) {
-    const todoTemplates = [
-        "制定月度計劃",
-        "進行健康檢查",
-        "更新技能培訓",
-        "整理財務報表",
-        "安排家庭聚會",
-        "進行冥想練習",
-        "參加社交活動",
-        "閱讀一本好書"
-    ];
-    
-    return todoTemplates
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 4)
-        .map(todo => ({
-            text: todo,
-            completed: false
-        }));
-}
-
-function displayMonthlyPlans(plans) {
-    const container = document.getElementById('monthlyPlanContainer');
-    container.innerHTML = '';
-
-    Object.entries(plans).forEach(([month, plan]) => {
-        const accordion = createMonthlyAccordion(month, plan);
-        container.appendChild(accordion);
-    });
-
-    // 保存到 localStorage
-    localStorage.setItem('monthlyPlans', JSON.stringify(plans));
-}
-
-function createMonthlyAccordion(month, plan) {
-    const accordion = document.createElement('div');
-    accordion.className = 'monthly-accordion';
-
-    const header = document.createElement('div');
-    header.className = 'month-header';
-    header.textContent = `${month}月`;
-    header.onclick = () => toggleAccordion(content);
-
-    const content = document.createElement('div');
-    content.className = 'month-content';
-
-    const focus = document.createElement('p');
-    focus.textContent = plan.focus;
-    content.appendChild(focus);
-
-    const todoList = document.createElement('ul');
-    todoList.className = 'todo-list';
-    
-    plan.todos.forEach((todo, index) => {
-        const li = document.createElement('li');
-        li.className = 'todo-item';
+// 新增列印樣式
+const style = document.createElement('style');
+style.textContent = `
+    @media print {
+        .nav-bar, .fortune-navigation, .fortune-footer, .goals-input {
+            display: none !important;
+        }
         
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = todo.completed;
-        checkbox.onchange = () => updateTodoStatus(month, index);
+        .content-section {
+            display: block !important;
+            break-inside: avoid;
+        }
         
-        const span = document.createElement('span');
-        span.textContent = todo.text;
+        .fortune-header {
+            background: none !important;
+            color: black !important;
+        }
         
-        li.appendChild(checkbox);
-        li.appendChild(span);
-        todoList.appendChild(li);
-    });
-
-    content.appendChild(todoList);
-    accordion.appendChild(header);
-    accordion.appendChild(content);
-
-    return accordion;
-}
-
-function toggleAccordion(content) {
-    content.classList.toggle('active');
-}
-
-function updateTodoStatus(month, index) {
-    const plans = JSON.parse(localStorage.getItem('monthlyPlans') || '{}');
-    if (plans[month] && plans[month].todos[index]) {
-        plans[month].todos[index].completed = !plans[month].todos[index].completed;
-        localStorage.setItem('monthlyPlans', JSON.stringify(plans));
+        .highlight-number {
+            color: var(--primary-color) !important;
+        }
     }
-}
+`;
+document.head.appendChild(style);
