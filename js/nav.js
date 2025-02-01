@@ -18,4 +18,21 @@ document.addEventListener('DOMContentLoaded', function() {
             link.classList.add('active');
         }
     });
+
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinksContainer = document.querySelector('.nav-links');
+
+    menuToggle.addEventListener('click', () => {
+        navLinksContainer.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-container')) {
+            navLinksContainer.classList.remove('active');
+            menuToggle.classList.remove('active');
+        }
+    });
 });
+
